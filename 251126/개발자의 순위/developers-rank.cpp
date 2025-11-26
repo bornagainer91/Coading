@@ -42,7 +42,7 @@ int main()
             // 모든 경기에서 a가 b보다 높은 순위인지 체크
             for (int l = 0; l < k; l++)
             {
-                if (iRank[l][i] >= iRank[l][j])
+                if (iRank[l][i] <= iRank[l][j])
                 {
                     ok = false;
                     break;
