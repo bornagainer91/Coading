@@ -37,7 +37,7 @@ int main() {
     for (int i=0; i<N; i++)
     {
         // cout << i << "번째 : " << endl;
-        for (int j=i+1; j<=i+K; j++)
+        for (int j=i+1; j<=i+K && j<N; j++)
         {
             // cout << j+K << endl;
             // cout << j << "번째- num i: " << num[i] << " num j: " << num[j] << endl;
