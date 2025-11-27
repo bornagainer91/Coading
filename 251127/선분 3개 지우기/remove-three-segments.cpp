@@ -9,32 +9,32 @@ using namespace std;
 
 int n {};
 int l[MAX_N] {}, r[MAX_N] {};
-int lr[MAX_N][2] {};
 
-
+// i1, i2, i3 선분을 제거했을 때,
+// 남은 선분들 중 어느 위치에서도 겹침 개수의 최대값을 구하는 함수
 int GetMaxOverlappedCnt(int i1, int i2, int i3)
 {
-    int counting[MAX_AB+1] {};
-    for(int i = 0; i < n; i++)
+    int counting[MAX_AB+1] {}; // 0으로 자동 초기화
+
+    for(int idx = 0; idx < n; idx++)
     {
-        if(i == i1 || i == i2 || i == i3)
-        {
+        // 제거한 3개의 선분은 건너뜀
+        if(idx == i1 || idx == i2 || idx == i3)
             continue;
-        }
 
-        int x1 = lr[i][0], x2 = lr[i][1];
-        for(int j = x1; j <= x2; j++)
-        {
-            counting[j]++;
-        }
+        // 현재 선분의 구간
+        int start = l[idx];
+        int end   = r[idx];
+
+        // 해당 구간의 모든 위치에 +1
+        for(int x = start; x <= end; x++)
+            counting[x]++;
     }
 
+    // counting 배열 중 가장 큰 값 반환
     int max_cnt = 0;
-
-    for(int j = 0; j <= MAX_AB; j++)
-    {
-        max_cnt = max(max_cnt, counting[j]);
-    }
+    for(int x = 0; x <= MAX_AB; x++)
+        max_cnt = max(max_cnt, counting[x]);
 
     return max_cnt;
 }
@@ -43,26 +43,20 @@ int main()
 {
     cin >> n;
 
-    for (int i = 0; i < n; i++)
-    {
+    for(int i = 0; i < n; i++)
         cin >> l[i] >> r[i];
-        for (int j=0; j<2; j++)
-        {
-            if (j==0) lr[i][j] = l[i];
-            if (j==1) lr[i][j] = r[i];
-        }
-    }
 
-    int iCnt {};
+    int iCnt = 0;
 
-    for (int i = 0; i < n; i++)
+    // i < j < k 형태로 모든 3개 조합 완전탐색
+    for(int i = 0; i < n; i++)
     {
-        for (int j = i+1; j < n; j++)
+        for(int j = i+1; j < n; j++)
         {
-            for (int k = j+1; k < n; k++)
+            for(int k = j+1; k < n; k++)
             {
-
-                // cout << GetMaxOverlappedCnt(i, j, k) << endl;
+                // 제거한 뒤, 겹치는 위치가 하나도 없어야 함
+                // 즉, 최대 겹침 수가 1이면 “겹침 없음”
                 if(GetMaxOverlappedCnt(i, j, k) == 1)
                 {
                     iCnt++;
