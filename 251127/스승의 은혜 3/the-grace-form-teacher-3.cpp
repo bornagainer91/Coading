@@ -35,22 +35,27 @@ int main() {
 
     // N명의 학생을 탐색
     for (int i = 0; i < N; i++)
-    {
+    {        
         int iTempMoney = B;
         int iCnt {};
 
-        // 할인 시작
-        P[i] = (P[i]/2);        
+        // 할인 시작(선물 가격이 0보다 크면)
+        if (P[i] > 0)
+        {
+            P[i] = (P[i]/2);
+        }
 
         for (int j = 0; j < N; j++)
         {
             // 예산 - (선물 + 배송비)
             iTempMoney = (iTempMoney - (P[j] + S[j]));
+            // cout << i+1 << "번째: " << iTempMoney << endl;
 
             // 예산이 부족해지면 break. 선물을 구매할 예산이 없으니깐.
             if (iTempMoney < 0)
             {
-                break;
+                iTempMoney = (iTempMoney + (P[j] + S[j]));
+                continue;
             }
 
             // 선물+배송 예산내에서 지불 완료.
@@ -61,7 +66,10 @@ int main() {
         iMax = max(iMax, iCnt);
 
         // 할인 복구
-        P[i] = (P[i]*2);
+        if (P[i] > 0)
+        {
+            P[i] = (P[i]*2);
+        }
     }
 
     //최대 선물 개수 출력
