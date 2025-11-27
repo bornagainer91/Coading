@@ -8,71 +8,59 @@
 using namespace std;
 
 int N {}, B {};
-int P[1000] {};
-int S[1000] {};
-
-/*
-1번째줄 : N, B
-N - 학생수, B - 예산
-
-2번째줄 : P, S
-P(i) - 선물가격, S(i) - 배송비
-*/
+int P[MAX_N] {};
+int S[MAX_N] {};
 
 int main() {
     cin >> N >> B;
 
     for (int i = 0; i < N; i++)
-    {
         cin >> P[i] >> S[i];
-    }
 
-    // 선물 1개를 할인해주고 마지막에는 다시 가격 원상복구.
-    //
+    int iMax = INT_MIN;
 
-    // 선물 가능한 최대 개수
-    int iMax = INT_MIN;    
-
-    // N명의 학생을 탐색
+    // 학생 i에 대해 할인 적용 시도
     for (int i = 0; i < N; i++)
-    {        
+    {
         int iTempMoney = B;
         int iCnt {};
 
-        // 할인 시작(선물 가격이 0보다 크면)
-        if (P[i] > 0)
-        {
-            P[i] = (P[i]/2);
-        }
+        // * 구매 비용 배열 생성 (정렬용)
+        int cost[MAX_N] {};
 
         for (int j = 0; j < N; j++)
         {
-            // 예산 - (선물 + 배송비)
-            iTempMoney = (iTempMoney - (P[j] + S[j]));
-            // cout << i+1 << "번째: " << iTempMoney << endl;
-
-            // 예산이 부족해지면 break. 선물을 구매할 예산이 없으니깐.
-            if (iTempMoney < 0)
+            if (j == i)
             {
-                iTempMoney = (iTempMoney + (P[j] + S[j]));
-                continue;
+                cost[j] = (P[j] / 2) + S[j];   // 할인된 학생
+            }                
+            else
+            {
+                cost[j] = P[j] + S[j];        // 일반 학생
             }
-
-            // 선물+배송 예산내에서 지불 완료.
-            iCnt++;
         }
 
-        // 위에서 구매한 선물에 대한 max count(지금까지 산 선물의 개수중에 가장 많은 것을 기록)
-        iMax = max(iMax, iCnt);
+        // *** 핵심: 전체를 정렬 (가장 싼 애부터 사야 최대 개수 가능)
+        sort(cost, cost + N);
 
-        // 할인 복구
-        if (P[i] > 0)
+        // * 정렬된 순서대로 예산이 허락하는 만큼 구매
+        for (int j = 0; j < N; j++)
         {
-            P[i] = (P[i]*2);
+            if (iTempMoney >= cost[j])
+            {
+                iTempMoney -= cost[j];
+                iCnt++;
+            }
+            else
+            {
+                break;
+            }
         }
+
+        // 최댓값 갱신
+        iMax = max(iMax, iCnt);
     }
 
-    //최대 선물 개수 출력
     cout << iMax << endl;
 
     return 0;
