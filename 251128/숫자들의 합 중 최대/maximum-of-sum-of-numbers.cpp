@@ -14,9 +14,15 @@ int main()
 
     for (int i=X; i<=Y; i++)
     {
-        if (i < 10)
-        if (i < 10)
-        if (i < 10)
+        int sum = 0;
+        int t = i;
+        while(t > 0)
+        {
+            sum += t % 10;
+            t /= 10;
+        }
+
+        iMax = max(iMax, sum);
     }
 
     cout << iMax << endl;
