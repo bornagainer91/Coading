@@ -21,20 +21,15 @@ int CaseMachine(int iMachineNum, int iTemperNum)
     if (iTemperNum < Ta[iMachineNum])
     {
         return C;
-    }
-    
-    if (iTemperNum >= Ta[iMachineNum] && iTemperNum <= Tb[iMachineNum])
+    }    
+    else if (iTemperNum >= Ta[iMachineNum] && iTemperNum <= Tb[iMachineNum])
     {
         return G;
-    }
-    
-    if (iTemperNum > Tb[iMachineNum])
+    }    
+    else if (iTemperNum > Tb[iMachineNum])
     {
         return H;
     }
-    
-    return 0;
-    
 }
 
 int main()
