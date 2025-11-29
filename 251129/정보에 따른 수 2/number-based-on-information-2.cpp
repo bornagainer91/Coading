@@ -2,96 +2,135 @@
 #include <algorithm>
 #include <climits>
 
+#define MAX_T 100
+
 using namespace std;
 
-#define MAX_T 100
-#define MAX_X 1000
+/*
+===============================================================
+[ 문제 설명 Summary ]
+
+좌표선 위에 여러 개의 알파벳이 주어짐.
+각 알파벳은 위치값을 하나씩 가지고 있으며, 종류는 'S' 혹은 'N'.
+
+우리는 x의 범위 a ~ b 사이의 모든 정수 위치에 대해 다음을 판단해야 함.
+
+---------------------------------------------------------------
+1) d1 = 해당 x에서 가장 가까운 'S'까지의 거리
+2) d2 = 해당 x에서 가장 가까운 'N'까지의 거리
+
+★ 특별한 위치 조건:
+    d1 <= d2 이면, x는 "특별한 위치"로 인정됨.
+
+---------------------------------------------------------------
+목표:
+a ~ b 전체 범위 중 특별한 위치의 개수를 출력하기.
+
+---------------------------------------------------------------
+입력:
+T     : 알파벳 총 개수
+a, b  : 검사할 x 구간 (a <= x <= b)
+이후 T개의 줄:
+    알파벳(S/N) + 해당 알파벳의 위치값
+
+---------------------------------------------------------------
+해결 전략 요약:
+
+1. 입력 시 S 위치들만 s[] 배열에 저장,
+            N 위치들만 n[] 배열에 저장한다.
+   → S, N을 섞어서 저장하면 거리 계산이 복잡해지므로,
+     입력 단계에서 미리 분리해두는 것이 핵심.
+
+2. x = a ~ b 까지 모든 좌표를 하나씩 확인한다.
+   - S 배열을 돌며 최소 거리(distance_s) 계산
+   - N 배열을 돌며 최소 거리(distance_n) 계산
+
+3. distance_s <= distance_n 이면 특별한 위치 → 카운트 증가
+
+4. 최종적으로 특별한 위치의 총 개수 출력
+
+===============================================================
+*/
+
+int t, a, b;           // t: 알파벳(S/N) 개수, a~b: 검사 범위
+
+int s[MAX_T];          // S 좌표들을 저장하는 배열
+int n[MAX_T];          // N 좌표들을 저장하는 배열
+int cnt_s = 0;         // S 개수
+int cnt_n = 0;         // N 개수
 
 int main()
 {
-    int T {}, iXstart_Pos {}, iXend_Pos {};
-    cin >> T >> iXstart_Pos >> iXend_Pos;
+    // --- 입력 수신 ---
+    cin >> t >> a >> b;
 
     /*
-        문제의 핵심:
-        - 좌표 위에 'S' 와 'N' 알파벳이 여러 개 놓여 있음.
-        - 각 알파벳은 특정 위치(pos)에 하나씩 존재.
-        - x 위치에서 가장 가까운 S 거리(d1)
-        - x 위치에서 가장 가까운 N 거리(d2)
-        - d1 <= d2 이면 그 x는 "특별한 위치"
-
-        가장 중요한 구조:
-        - S와 N을 섞어 저장하지 않고,
-          S 배열, N 배열로 따로 분리 저장.
-          → 그래야 거리 계산이 단순해지고 명확해짐.
+        입력을 받으면서 S와 N을 각각 분리하여 저장.
+        이렇게 해두면 거리 계산 시 매우 직관적으로 처리할 수 있음.
     */
-
-    // S와 N 각각의 위치를 저장하는 배열
-    int S_Pos[MAX_T] {};    // S가 놓인 좌표들
-    int N_Pos[MAX_T] {};    // N이 놓인 좌표들
-
-    int S_Count = 0;        // S가 몇 개 있는지
-    int N_Count = 0;        // N이 몇 개 있는지
-
-    // --- 입력 단계 ---
-    for (int i = 0; i < T; i++)
+    for (int i = 0; i < t; i++)
     {
-        char c {};          // 'S' 또는 'N'
-        int pos {};         // 그 알파벳이 놓인 좌표
+        char alpabet {};
+        int pos {};
 
-        cin >> c >> pos;
+        cin >> alpabet >> pos;
 
-        // 입력받은 알파벳을 종류별로 분류하여 저장
-        if (c == 'S')
+        if (alpabet == "S"[0]) // S면 s배열에 저장
         {
-            S_Pos[S_Count++] = pos;
+            s[cnt_s++] = pos;
         }
-        else    // 'N'
+        else                   // N이면 n배열에 저장
         {
-            N_Pos[N_Count++] = pos;
+            n[cnt_n++] = pos;
         }
     }
 
-    int iAnswer = 0;    // 특별한 위치 개수
+    int ans = 0;   // 특별한 위치 개수를 저장할 변수
 
-    // --- x = a ~ b 까지 모든 위치를 검사 ---
-    for (int x = iXstart_Pos; x <= iXend_Pos; x++)
+    /*
+        x = a ~ b 까지 모든 정수 위치를 검사.
+        각 x에서 S와 N까지의 최소 거리를 비교해 특별한 위치인지 판정.
+    */
+    for (int x = a; x <= b; x++)
     {
-        // 각각 가장 가까운 S 거리, N 거리를 매우 큰 값으로 초기화
-        int iMin_S_Distance = INT_MAX;
-        int iMin_N_Distance = INT_MAX;
+        int distance_s = INT_MAX;   // x에서 가장 가까운 S까지의 거리
+        int distance_n = INT_MAX;   // x에서 가장 가까운 N까지의 거리
 
+        // --- S 최소거리 계산 ---
         /*
-            1) 현재 x에서 S들까지의 거리 중 가장 가까운 값을 찾기
-               예: S_Pos = {1, 10}이고 x = 7이면
-                   |7-1| = 6, |7-10| = 3 → 최소값 3
+            현재 x에서 모든 S 좌표와의 거리 |s[j] - x| 중
+            가장 작은 값을 distance_s 에 저장.
         */
-        for (int i = 0; i < S_Count; i++)
+        for (int j = 0; j < cnt_s; j++)
         {
-            int diff = abs(x - S_Pos[i]);     // x와 S 좌표 거리
-            iMin_S_Distance = min(iMin_S_Distance, diff);
+            distance_s = min(distance_s, abs(s[j] - x));
+        }
+
+        // --- N 최소거리 계산 ---
+        /*
+            현재 x에서 모든 N 좌표와의 거리 |n[j] - x| 중
+            가장 작은 값을 distance_n 에 저장.
+        */
+        for (int j = 0; j < cnt_n; j++)
+        {
+            distance_n = min(distance_n, abs(n[j] - x));
         }
 
         /*
-            2) 현재 x에서 N들까지의 거리 중 가장 가까운 값을 찾기
-        */
-        for (int i = 0; i < N_Count; i++)
-        {
-            int diff = abs(x - N_Pos[i]);     // x와 N 좌표 거리
-            iMin_N_Distance = min(iMin_N_Distance, diff);
-        }
+            특별한 위치 판정:
+            - S가 더 가깝거나 (distance_s < distance_n)
+            - S와 N까지의 거리가 같으면(distance_s == distance_n)
 
-        /*
-            3) 조건 검사: d1(S) <= d2(N)이면 특별한 위치
+            즉, distance_s <= distance_n 이면 특별한 위치.
         */
-        if (iMin_S_Distance <= iMin_N_Distance)
+        if (distance_s <= distance_n)
         {
-            iAnswer++;
+            ans++;     // 특별한 위치 하나 증가
         }
     }
 
-    // 특별한 위치의 총 개수 출력
-    cout << iAnswer << endl;
+    // --- 결과 출력 ---
+    cout << ans;
 
     return 0;
 }
