@@ -75,7 +75,7 @@ int main()
 
         cin >> alpabet >> pos;
 
-        if (alpabet == "S"[0]) // S면 s배열에 저장
+        if (alpabet == 'S') // S면 s배열에 저장
         {
             s[cnt_s++] = pos;
         }
