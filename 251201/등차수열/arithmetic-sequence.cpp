@@ -29,7 +29,8 @@ int main()
         {
             for (int j = i+1; j < n; j++)
             {
-                if (abs(a[i]-x) == abs(x-a[j]))
+                // if (abs(a[i]-x) == abs(x-a[j]))
+                if (a[i] + a[j] == 2*x)
                 {
                     iCnt++;
                 }
