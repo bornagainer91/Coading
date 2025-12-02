@@ -29,21 +29,15 @@ int main()
         // 해수면 높이마다 빙산이 몇개씩인지 Count하는 변수
         int ice_Cnt {};
         bool bChkIce = false;
-        
+
         // 빙산의 개수
         for (int i = 0; i < n; i++)
         {
             //핵심 로직 - 해수면의 높이보다 빙산이 높으면 Count
             //단, 빙산이 이어지지 않으면 그게 1덩이리임.
             //ice를 발견하면 True, 아니면 False
-
-            // if(j == 2)
-            // {
-            //     cout << i+1 << "- 빙산의 높이: " << h[i] << " 해수면 높이: " << j << endl;
-            // }
-
             if(h[i] > j)
-            {   
+            {
                 bChkIce = true;
             }
             else
@@ -54,15 +48,20 @@ int main()
                 }
                 bChkIce = false;
             }
-            
-            // 모든 빙산의 높이가 같아서 위의 분기에 처리가 안되었을 때, 1덩이리 count 하기 위해서
-            if (bChkIce && ice_Cnt == 0)
+
+            if(i==n-1 && bChkIce)
             {
                 ice_Cnt++;
             }
         }
+
         ice_Max = max(ice_Max, ice_Cnt);
     }
+    // 모든 빙산의 높이가 같아서 위의 분기에 처리가 안되었을 때, 1덩이리 count 하기 위해서
+    // if (bChkIce && ice_Cnt == 0)
+    // {
+    //     ice_Cnt = 1;
+    // }
 
     cout << ice_Max << endl;
 
